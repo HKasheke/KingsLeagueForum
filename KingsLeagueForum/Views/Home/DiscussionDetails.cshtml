@@ -1,0 +1,37 @@
+﻿@model KingsLeagueForum.Models.Discussion
+
+@{
+	ViewData["Title"] = "Discussion Details";
+	//string imageUrl = Url.Content("/photos/" + Model.ImageFilename);
+}
+@*<div class="row d-flex justify-content-center">
+	<div class="col-md-5">
+		<img src="@imageUrl" alt="@Model.ImageFile" class="img-fluid" />
+	</div>
+</div>*@
+
+
+<table class="table">
+	<tr>
+		<td>
+			Published
+			@Model.CreateDate.ToString("MMM d, yyyy")
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+			@Html.DisplayFor(model => model.Title)
+		</td>
+	</tr>
+</table>
+
+<div class="mb=3">
+	@if (Model.Comments != null)
+	{
+		foreach (var comment in Model.Comments)
+		{
+			<span class="pe-2 btn btn-primary btn-sm">@comment.Content <a asp-controller="Tags" asp-route-id="@comment.CommentId"></a> </span>
+		}
+	}
+</div>
