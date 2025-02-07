@@ -13,19 +13,19 @@
             <input type="hidden" name="DiscussionId" value="@ViewBag.DiscussionId"/>
 
             <div class="mb-3">
-                <label asp-for="Content" class="control-label"></label>
+                <label  class="control-label">Comment</label>
                 <input asp-for="Content" class="form-control" />
                 <span asp-validation-for="Content" class="text-danger"></span>
             </div>
 			<div class="mb-3">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Add Comment" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-controller="Discussions" asp-action="Edit" asp-route-id="@ViewBag.DiscussionId">Back to Photo</a>
+    <a asp-controller="Home" asp-action="DiscussionDetails" asp-route-id="@ViewBag.DiscussionId">Back to Thread</a>
 </div>
 
 @section Scripts {

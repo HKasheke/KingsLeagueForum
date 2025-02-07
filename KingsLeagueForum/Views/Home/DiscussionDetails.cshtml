@@ -13,10 +13,13 @@
 		<img src="@imageUrl" class="img-fluid col-4" alt="@Model.Title" />
 		<p class="ms-3">@Model.Content</p>
 	</div>
+	<p>
+		Created @Model.CreateDate.ToString("MMM d, yyyy")
+	</p>
 </div>
 
 <div class="mb-3">
-	<a asp-controller="Comments" asp-action="Create" asp-route-id="@Model.DiscussionId" class="me-2 btn btn-light">Add Comment</a>
+	<a asp-controller="Comments" asp-action="Create" asp-route-id="@Model.DiscussionId" class="me-2 btn btn-primary">Add Comment</a>
 </div>
 
 <div class="mb-3 border">

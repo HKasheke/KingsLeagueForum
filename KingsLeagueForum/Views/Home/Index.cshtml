@@ -1,14 +1,14 @@
 ﻿@model List<KingsLeagueForum.Models.Discussion>
 @{
-    ViewData["Title"] = "Home Page";
+	ViewData["Title"] = "Home Page";
 }
 
 
-<h1 class="fm-bold">Welcome</h1>
+<h1 class="fm-bold">Welcome...</h1>
 
-<div>
-    The weirdest form of soccer
-</div>
+<h5>
+    ...to the home of the weirdest form of soccer...
+</h5>
 <hr />
 
 <div class="mb-4">
@@ -19,16 +19,18 @@
 
 		<div class="border rounded mb-2 mh-75">
 
-			<h3 class="mt-0 ms-1">@item.Title</h3>
-
-			<dl class="row mb-0 ms-2">
+			<dl class="row mb-0 ms-2 mt-1">
 				<dd class="col-sm-3">
-					<a class="" href="@Url.Action("DiscussionDetails", "Home", new { id = item.DiscussionId })">
-						<img src="@imageUrl" class="img-fluid" alt="@item.Title" />
-					</a>
+					<img src="@imageUrl" class="img-fluid" alt="@item.Title" />
 				</dd>
 				<dd class="col-sm-9">
-					@item.Content<br />
+					<a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="@Url.Action("DiscussionDetails", "Home", new { id = item.DiscussionId })"> <h3 class="mt-0 ms-1">@item.Title</h3></a>
+				</dd>
+				<dd class="col-sm-12">
+					<strong>Comments: </strong>@(item.Comments != null ? item.Comments.Count : 0)
+				</dd>
+				<dd class="col-sm-12">
+					<strong>Created: </strong>@(item.CreateDate)
 				</dd>
 			</dl>
 		</div>

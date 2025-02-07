@@ -17,18 +17,29 @@ namespace KingsLeagueForum.Controllers
 
         public async Task <IActionResult> Index()
         {
-            var discussions = await _context.Discussion.ToListAsync();
+            var discussions = await _context.Discussion.
+                Include(m => m.Comments)
+                .ToListAsync();
             return View(discussions);
         }
 
         public async Task<IActionResult> DiscussionDetails(int id)
         {
             //get discussion by id
-            var discussion = await _context.Discussion.Include(m => m.Comments).FirstOrDefaultAsync(p => p.DiscussionId == id);
+            var discussion = await _context.Discussion.
+                Include(m => m.Comments)
+                .FirstOrDefaultAsync(p => p.DiscussionId == id);
             if (discussion == null)
             {
                 return NotFound();
             }
+
+            // Order comments by CreateDate descending
+            if(discussion.Comments != null)
+            {
+                discussion.Comments = discussion.Comments.OrderByDescending(c => c.CreateDate).ToList();
+            }
+
             return View(discussion); // Pass the photo to the view
         }
 
