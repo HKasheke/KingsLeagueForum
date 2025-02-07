@@ -2,29 +2,28 @@
 
 @{
 	ViewData["Title"] = "Discussion Details";
-	//string imageUrl = Url.Content("/photos/" + Model.ImageFilename);
+	string imageUrl = Url.Content("/photos/" + Model.ImageFilename);
 }
-@*<div class="row d-flex justify-content-center">
-	<div class="col-md-5">
-		<img src="@imageUrl" alt="@Model.ImageFile" class="img-fluid" />
-	</div>
-</div>*@
 
+<div class="row">
+	<h3>@Html.DisplayFor(model => model.Title)</h3>
+	<hr />
 
-<table class="table">
-	<tr>
-		<td>
-			Published
+	<img src="@imageUrl" class="img-fluid col-4" alt="@Model.Title" />
+
+	<dl class="row">
+		<dt class="col-sm-2">
+			@Html.DisplayNameFor(model => model.CreateDate)
+		</dt>
+		<dd class="col-sm-10">
 			@Model.CreateDate.ToString("MMM d, yyyy")
-		</td>
-	</tr>
-
-	<tr>
-		<td>
-			@Html.DisplayFor(model => model.Title)
-		</td>
-	</tr>
-</table>
+		</dd>
+	</dl>
+	<p>
+		<b>@Html.DisplayNameFor(model => model.CreateDate) </b>
+		@Model.CreateDate.ToString("MMM d, yyyy")
+	</p>
+</div>
 
 <div class="mb=3">
 	@if (Model.Comments != null)
