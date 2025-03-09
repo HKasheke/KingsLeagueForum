@@ -2,10 +2,13 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
+using System.IO;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using KingsLeagueForum.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -14,12 +17,12 @@ namespace KingsLeagueForum.Areas.Identity.Pages.Account.Manage
 {
     public class IndexModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
         public IndexModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager)
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -51,6 +54,25 @@ namespace KingsLeagueForum.Areas.Identity.Pages.Account.Manage
         /// </summary>
         public class InputModel
         {
+            //////////////////////////////////
+            ///Begin change
+            //////////////////////////////////
+            [Required]
+            [DataType(DataType.Text)]
+            [Display(Name = "Full name")]
+            public string Name { get; set; }
+
+            [DataType(DataType.Text)]
+            [Display(Name = "Location")]
+            public string Location { get; set; }
+
+            [Display(Name = "Profile picture")]
+            public string ImageFilename { get; set; }
+
+            [Display(Name = "Upload new profile picture")]
+            public IFormFile? ImageFile { get; set; }
+            //////////////////////////////////////////
+
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
@@ -60,7 +82,7 @@ namespace KingsLeagueForum.Areas.Identity.Pages.Account.Manage
             public string PhoneNumber { get; set; }
         }
 
-        private async Task LoadAsync(IdentityUser user)
+        private async Task LoadAsync(ApplicationUser user)
         {
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
@@ -69,6 +91,9 @@ namespace KingsLeagueForum.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
+                Name = user.Name,
+                Location = user.Location,
+                ImageFilename = user.ImageFilename,
                 PhoneNumber = phoneNumber
             };
         }
@@ -99,6 +124,31 @@ namespace KingsLeagueForum.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
+            ////////////////////////////////
+            // Update the user properties///
+            ////////////////////////////////
+            user.Name = Input.Name;
+            user.Location = Input.Location;
+
+            if (Input.ImageFile != null && Input.ImageFile.Length > 0)
+            {
+                // Generate a unique filename
+                user.ImageFilename = Guid.NewGuid().ToString() + Path.GetExtension(Input.ImageFile.FileName);
+
+                // Define the path where to save the file
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "photos", "profiles");
+
+                var filePath = Path.Combine(uploadsFolder, user.ImageFilename);
+
+                // Save the file
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await Input.ImageFile.CopyToAsync(fileStream);
+                }
+            }
+            //////////////////////////////////
+
+
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
             if (Input.PhoneNumber != phoneNumber)
             {
@@ -108,6 +158,14 @@ namespace KingsLeagueForum.Areas.Identity.Pages.Account.Manage
                     StatusMessage = "Unexpected error when trying to set phone number.";
                     return RedirectToPage();
                 }
+            }
+
+            // Save the user updates
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                StatusMessage = "Unexpected error when trying to update profile.";
+                return RedirectToPage();
             }
 
             await _signInManager.RefreshSignInAsync(user);

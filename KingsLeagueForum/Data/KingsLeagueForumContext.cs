@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace KingsLeagueForum.Data
 {
-    public class KingsLeagueForumContext : IdentityDbContext
+    public class KingsLeagueForumContext : IdentityDbContext<ApplicationUser>
     {
         public KingsLeagueForumContext (DbContextOptions<KingsLeagueForumContext> options)
             : base(options)

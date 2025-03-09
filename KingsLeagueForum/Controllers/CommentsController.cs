@@ -8,16 +8,21 @@ using Microsoft.EntityFrameworkCore;
 using KingsLeagueForum.Data;
 using KingsLeagueForum.Models;
 using Azure;
+using Microsoft.AspNetCore.Identity;
 
 namespace KingsLeagueForum.Controllers
 {
     public class CommentsController : Controller
     {
         private readonly KingsLeagueForumContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public CommentsController(KingsLeagueForumContext context)
+        public CommentsController(
+            KingsLeagueForumContext context,
+            UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Comments
@@ -36,6 +41,13 @@ namespace KingsLeagueForum.Controllers
                 return NotFound();
             }
 
+            // Verify the discussion exists
+            var discussionExists = _context.Discussion.Any(d => d.DiscussionId == id);
+            if (!discussionExists)
+            {
+                return NotFound();
+            }
+
             // Set the Discussion Id for the comment's fk
             ViewData["DiscussionId"] = id;
 
@@ -49,6 +61,16 @@ namespace KingsLeagueForum.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("CommentId,Content,DiscussionId")] Comment comment)
         {
+            // Get the current user
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            // Set the user ID 
+            comment.ApplicationUserId = user.Id;
+
             //init date time
             comment.CreateDate = DateTime.Now;
 
@@ -74,11 +96,21 @@ namespace KingsLeagueForum.Controllers
 
             var comment = await _context.Comment
                 .Include(x => x.DiscussionId)
+                .Include(c => c.User)
                 .FirstOrDefaultAsync(m => m.CommentId == id);
             if (comment == null)
             {
                 return NotFound();
             }
+
+            // Check if the current user is the owner of the comment
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null || comment.ApplicationUserId != currentUser.Id)
+            {
+                return Forbid(); // Not the owner - deny access
+            }
+
+            ViewData["DiscussionId"] = comment.DiscussionId;
 
             return View(comment);
         }

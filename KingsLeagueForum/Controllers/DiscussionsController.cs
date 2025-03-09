@@ -7,25 +7,35 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using KingsLeagueForum.Data;
 using KingsLeagueForum.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace KingsLeagueForum.Controllers
 {
+    [Authorize] // Restrict access to authenticated users only
     public class DiscussionsController : Controller
     {
         private readonly KingsLeagueForumContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public DiscussionsController(KingsLeagueForumContext context)
+        public DiscussionsController(
+            KingsLeagueForumContext context,
+            UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Discussions
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Discussion.ToListAsync());
+            return View(await _context.Discussion
+                .Include(d => d.User)
+                .ToListAsync());
         }
 
         // GET: Discussions/Details/5
+        [AllowAnonymous] // Allow unauthenticated users to view discussion details
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -34,6 +44,9 @@ namespace KingsLeagueForum.Controllers
             }
 
             var discussion = await _context.Discussion
+                .Include(d => d.User)
+                .Include(d => d.Comments)
+                    .ThenInclude(c => c.User)
                 .FirstOrDefaultAsync(m => m.DiscussionId == id);
             if (discussion == null)
             {
@@ -56,6 +69,15 @@ namespace KingsLeagueForum.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("DiscussionId,Title,Content,ImageFile")] Discussion discussion)
         {
+            // Get the current user
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            discussion.ApplicationUserId = user.Id;
+
             // init date time
             discussion.CreateDate = DateTime.Now;
 
@@ -89,10 +111,20 @@ namespace KingsLeagueForum.Controllers
                 return NotFound();
             }
 
-            var discussion = await _context.Discussion.Include("Comments").FirstOrDefaultAsync(m => m.DiscussionId == id);
+            var discussion = await _context.Discussion.Include("Comments")
+                .Include(d => d.Comments)
+                .FirstOrDefaultAsync(m => m.DiscussionId == id);
             if (discussion == null)
             {
                 return NotFound();
+            }
+
+            // Check if the current user is the owner of the discussion
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null || discussion.ApplicationUserId != currentUser.Id)
+            {
+                // Not the owner - deny access
+                return Forbid(); // Returns a 403 Forbidden response
             }
 
             return View(discussion);
@@ -109,6 +141,23 @@ namespace KingsLeagueForum.Controllers
             {
                 return NotFound();
             }
+
+            // Get the original discussion to check ownership
+            var originalDiscussion = await _context.Discussion.FindAsync(id);
+            if (originalDiscussion == null)
+            {
+                return NotFound();
+            }
+
+            // Check if the current user is the owner
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null || originalDiscussion.ApplicationUserId != currentUser.Id)
+            {
+                return Forbid(); // Not the owner - deny access
+            }
+
+            // Preserve the original user ID
+            discussion.ApplicationUserId = originalDiscussion.ApplicationUserId;
 
             if (ModelState.IsValid)
             {
@@ -142,10 +191,18 @@ namespace KingsLeagueForum.Controllers
             }
 
             var discussion = await _context.Discussion
+                .Include(d => d.User)
                 .FirstOrDefaultAsync(m => m.DiscussionId == id);
             if (discussion == null)
             {
                 return NotFound();
+            }
+
+            // Check if the current user is the owner
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null || discussion.ApplicationUserId != currentUser.Id)
+            {
+                return Forbid(); // Not the owner - deny access
             }
 
             return View(discussion);
@@ -159,6 +216,13 @@ namespace KingsLeagueForum.Controllers
             var discussion = await _context.Discussion.FindAsync(id);
             if (discussion != null)
             {
+                // Check if the current user is the owner
+                var currentUser = await _userManager.GetUserAsync(User);
+                if (currentUser == null || discussion.ApplicationUserId != currentUser.Id)
+                {
+                    return Forbid(); // Not the owner - deny access
+                }
+
                 // Delete the image file if it exists
                 if (!string.IsNullOrEmpty(discussion.ImageFilename))
                 {

@@ -4,6 +4,7 @@ using KingsLeagueForum.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KingsLeagueForum.Migrations
 {
     [DbContext(typeof(KingsLeagueForumContext))]
-    partial class KingsLeagueForumContextModelSnapshot : ModelSnapshot
+    [Migration("20250309182114_UserDataNullable")]
+    partial class UserDataNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -105,9 +108,6 @@ namespace KingsLeagueForum.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CommentId"));
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -119,8 +119,6 @@ namespace KingsLeagueForum.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("CommentId");
-
-                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("DiscussionId");
 
@@ -134,9 +132,6 @@ namespace KingsLeagueForum.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DiscussionId"));
-
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -154,8 +149,6 @@ namespace KingsLeagueForum.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("DiscussionId");
-
-                    b.HasIndex("ApplicationUserId");
 
                     b.ToTable("Discussion");
                 });
@@ -299,28 +292,11 @@ namespace KingsLeagueForum.Migrations
 
             modelBuilder.Entity("KingsLeagueForum.Models.Comment", b =>
                 {
-                    b.HasOne("KingsLeagueForum.Data.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("ApplicationUserId");
-
-                    b.HasOne("KingsLeagueForum.Models.Discussion", "Discussion")
+                    b.HasOne("KingsLeagueForum.Models.Discussion", null)
                         .WithMany("Comments")
                         .HasForeignKey("DiscussionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Discussion");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("KingsLeagueForum.Models.Discussion", b =>
-                {
-                    b.HasOne("KingsLeagueForum.Data.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("ApplicationUserId");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

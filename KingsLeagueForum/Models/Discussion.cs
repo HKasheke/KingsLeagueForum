@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using KingsLeagueForum.Data;
+using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace KingsLeagueForum.Models
@@ -20,6 +22,13 @@ namespace KingsLeagueForum.Models
         [Display(Name = "Created")]
         public DateTime CreateDate { get; set; } = DateTime.Now;
         
-        public  List<Comment>? Comments { get; set; } 
+        public  List<Comment>? Comments { get; set; }
+
+        // Foreign key property for user
+        public string? ApplicationUserId { get; set; }
+
+        // Navigation property to user
+        [ForeignKey("ApplicationUserId")]
+        public ApplicationUser? User { get; set; }
     }
 }

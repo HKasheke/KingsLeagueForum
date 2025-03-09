@@ -4,6 +4,7 @@ using KingsLeagueForum.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KingsLeagueForum.Migrations
 {
     [DbContext(typeof(KingsLeagueForumContext))]
-    partial class KingsLeagueForumContextModelSnapshot : ModelSnapshot
+    [Migration("20250309201840_CommentAndDiscussionFK")]
+    partial class CommentAndDiscussionFK
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
