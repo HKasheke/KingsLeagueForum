@@ -94,6 +94,7 @@ namespace KingsLeagueForum.Controllers
             {
                 return NotFound();
             }
+
             return View(discussion);
         }
 
@@ -102,7 +103,7 @@ namespace KingsLeagueForum.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("DiscussionId,Title,Content,ImageFilename,CreateDate")] Discussion discussion)
+        public async Task<IActionResult> Edit(int id, [Bind("DiscussionId,Title,ImageFilename,Content,CreateDate")] Discussion discussion)
         {
             if (id != discussion.DiscussionId)
             {
@@ -158,6 +159,16 @@ namespace KingsLeagueForum.Controllers
             var discussion = await _context.Discussion.FindAsync(id);
             if (discussion != null)
             {
+                // Delete the image file if it exists
+                if (!string.IsNullOrEmpty(discussion.ImageFilename))
+                {
+                    string filePath = Path.Combine(Directory.GetCurrentDirectory(),
+                                                 "wwwroot", "photos", discussion.ImageFilename);
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+                }
                 _context.Discussion.Remove(discussion);
             }
 

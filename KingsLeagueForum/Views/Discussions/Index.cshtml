@@ -19,9 +19,6 @@
                 @Html.DisplayNameFor(model => model.Content)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ImageFilename)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.CreateDate)
             </th>
             <th></th>
@@ -29,15 +26,13 @@
     </thead>
     <tbody>
 @foreach (var item in Model) {
+        string imageUrl = Url.Content("/photos/" + item.ImageFilename);
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
+            <td class="col-1">
+                <img src="@imageUrl" class="img-fluid" alt="@item.ImageFilename" />
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Content)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ImageFile)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.CreateDate)

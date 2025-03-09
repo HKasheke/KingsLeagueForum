@@ -1,9 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using KingsLeagueForum.Data;
+using Microsoft.AspNetCore.Identity;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<KingsLeagueForumContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("KingsLeagueForumContext") ?? throw new InvalidOperationException("Connection string 'KingsLeagueForumContext' not found.")));
+
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<KingsLeagueForumContext>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

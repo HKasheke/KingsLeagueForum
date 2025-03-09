@@ -4,10 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using KingsLeagueForum.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace KingsLeagueForum.Data
 {
-    public class KingsLeagueForumContext : DbContext
+    public class KingsLeagueForumContext : IdentityDbContext
     {
         public KingsLeagueForumContext (DbContextOptions<KingsLeagueForumContext> options)
             : base(options)

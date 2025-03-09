@@ -57,7 +57,7 @@ namespace KingsLeagueForum.Controllers
                 _context.Add(comment);
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction("Edit", "Discussions", new { id = comment.DiscussionId });
+                return RedirectToAction("DiscussionDetails", "Home", new { id = comment.DiscussionId });
             }
             ViewData["DiscussionId"] = comment.DiscussionId;
             return View(comment);
