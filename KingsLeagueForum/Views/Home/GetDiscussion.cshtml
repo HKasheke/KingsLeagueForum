@@ -1,0 +1,86 @@
+﻿@model KingsLeagueForum.Models.Discussion
+
+@{
+
+    ViewData["Title"] = "Get Discussion";
+    string imageUrl = Url.Content("/photos/" + Model.ImageFilename);
+
+    string profileImageUrl = Model.User != null && !string.IsNullOrEmpty(Model.User.ImageFilename)
+
+        ? Url.Content("/photos/profiles/" + Model.User.ImageFilename)
+
+        : Url.Content("/photos/profiles/defaultUser.png");
+}
+
+<div class="row border border-1 border-black ">
+    <div class="d-flex my-3">
+        @if (Model.User != null)
+        {
+            <img src="@profileImageUrl" class="rounded-circle me-2" alt="Profile" style="width: 40px; height: 40px; object-fit: cover;" />
+            <span>
+                <a asp-controller="Home" asp-action="Profile" asp-route-id="@Model.ApplicationUserId">
+                    @Model.User.Name
+                </a>
+            </span>
+                    }
+    </div>
+
+
+    <h3>@Html.DisplayFor(model => model.Title)</h3>
+
+    <div class="d-inline-flex ms-0 mb-3">
+                <img src="@imageUrl" class="img-fluid col-4" alt="@Model.Title" />
+        <div class="ms-3">
+            <p>@Model.Content</p>
+
+        </div>
+    </div>
+
+    <p>
+        Created @Model.CreateDate.ToString("MMM d, yyyy")
+    </p>
+</div>
+
+<div class="mb-3 border">
+    @if (Model.Comments != null)
+    {
+        <h4 class="m-2">Comments</h4>
+        foreach (var comment in Model.Comments)
+        {
+            string commentUserImage = comment.User != null && !string.IsNullOrEmpty(comment.User.ImageFilename)
+            ? Url.Content("/photos/profiles/" + comment.User.ImageFilename)
+            : "/images/default-profile.png";
+
+            <div class="border rounded m-2 p-2">
+                <div class="d-flex align-items-center mb-2">
+                    @if (comment.User != null)
+                    {
+                        <img src="@commentUserImage" class="rounded-circle me-2" alt="Profile" style="width: 30px; height: 30px; object-fit: cover;" />
+                        <span class="fw-bold">
+                            <a asp-controller="Home" asp-action="Profile" asp-route-id="@comment.ApplicationUserId">
+                                @comment.User.Name
+                            </a>
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="fw-bold">Unknown</span>
+                    }
+                    <small class="ms-2 text-muted">@comment.CreateDate.ToString("MMM d, yyyy - h:mm tt")</small>
+                </div>
+                <p class="mb-0">@comment.Content</p>
+            </div>
+        }
+    }
+</div>
+
+<div class="mb-3">
+    @if (User.Identity.IsAuthenticated)
+    {
+        <a asp-controller="Comments" asp-action="Create" asp-route-id="@Model.DiscussionId" class="me-2 btn btn-primary">Add Comment</a>
+    }
+    else
+    {
+        <a asp-area="Identity" asp-page="/Account/Login" class="me-2 btn btn-outline-primary">Log in to comment</a>
+    }
+</div>

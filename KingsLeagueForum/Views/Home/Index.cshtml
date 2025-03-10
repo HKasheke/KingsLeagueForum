@@ -17,22 +17,37 @@
         
         string imageUrl = Url.Content("/photos/" + item.ImageFilename);
 
-		<div class="border rounded mb-2 mh-75">
-
-			<dl class="row mb-0 ms-2 mt-1">
-				<dd class="col-sm-2">
-					<img src="@imageUrl" class="img-fluid" alt="@item.Title" />
-				</dd>
-				<dd class="col-sm-9">
-					<a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="@Url.Action("DiscussionDetails", "Home", new { id = item.DiscussionId })"> <h3 class="mt-0 ms-1">@item.Title</h3></a>
-				</dd>
-				<dd class="col-sm-12">
-					<strong>Comments: </strong>@(item.Comments != null ? item.Comments.Count : 0)
-				</dd>
-				<dd class="col-sm-12">
-					<strong>Created: </strong>@(item.CreateDate)
-				</dd>
-			</dl>
-		</div>
+        <div class="border rounded mb-2 mh-75">
+            <dl class="row mb-0 ms-2 mt-1">
+                <dd class="col-sm-2">
+                    <img src="@imageUrl" class="img-fluid" alt="@item.Title" />
+                </dd>
+                <dd class="col-sm-9">
+                    <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover"
+                       href="@Url.Action("GetDiscussion", "Home", new { id = item.DiscussionId })">
+                        <h3 class="mt-0 ms-1">@item.Title</h3>
+                    </a>
+                </dd>
+                <dd class="col-sm-12">
+                    <strong>Posted by: </strong>
+                    @if (item.User != null)
+                    {
+                        <a asp-controller="Home" asp-action="Profile" asp-route-id="@item.ApplicationUserId">
+                            @item.User.Name
+                        </a>
+                    }
+                    else
+                    {
+                        <span>Unknown</span>
+                    }
+                </dd>
+                <dd class="col-sm-12">
+                    <strong>Comments: </strong>@(item.Comments != null ? item.Comments.Count : 0)
+                </dd>
+                <dd class="col-sm-12">
+                    <strong>Created: </strong>@item.CreateDate.ToString("MMM dd, yyyy - h:mm tt")
+                </dd>
+            </dl>
+        </div>
     }
 </div>

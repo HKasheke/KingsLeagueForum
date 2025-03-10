@@ -9,9 +9,11 @@ using KingsLeagueForum.Data;
 using KingsLeagueForum.Models;
 using Azure;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace KingsLeagueForum.Controllers
 {
+    [Authorize] // Require login to add comment
     public class CommentsController : Controller
     {
         private readonly KingsLeagueForumContext _context;
@@ -79,7 +81,7 @@ namespace KingsLeagueForum.Controllers
                 _context.Add(comment);
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction("DiscussionDetails", "Home", new { id = comment.DiscussionId });
+                return RedirectToAction("GetDiscussion", "Home", new { id = comment.DiscussionId });
             }
             ViewData["DiscussionId"] = comment.DiscussionId;
             return View(comment);

@@ -29,9 +29,20 @@ namespace KingsLeagueForum.Controllers
         // GET: Discussions
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Discussion
-                .Include(d => d.User)
-                .ToListAsync());
+            // Get the current user
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return Challenge(); // Redirect to login if user isn't authenticated
+            }
+
+            // Get only discussions created by the current user
+            var userDiscussions = await _context.Discussion
+                .Where(d => d.ApplicationUserId == currentUser.Id)
+                .OrderByDescending(d => d.CreateDate) // Newest first
+                .ToListAsync();
+
+            return View(userDiscussions);
         }
 
         // GET: Discussions/Details/5

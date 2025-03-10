@@ -39,7 +39,7 @@
             @if (!string.IsNullOrEmpty(Model.Input.ImageFilename))
             {
                 <div class="form-group mb-3">
-                    <label>Current Profile Picture</label>
+                    <label class="fw-bold">Current Profile Picture</label>
                     <div>
                         <img src="~/photos/profiles/@Model.Input.ImageFilename" alt="Profile Picture" style="max-width: 200px; max-height: 200px;" />
                     </div>
